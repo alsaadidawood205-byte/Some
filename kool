@@ -1,0 +1,202 @@
+local G2L = {};
+
+if getgenv().spookichat then
+	warn("SPOOKI CHAT is already loaded.")
+	getgenv().spookichat:close()
+	return
+end
+
+-- [[ SPOOKI CHAT - RB & BI Rainbow Edition ]] --
+
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- وظيفة تحويل الحروف (استخراج من الكود الأصلي)
+local function ConvertToCircled(text)
+    local charMap = {
+        ["a"] = "ⓐ", ["b"] = "ⓑ", ["c"] = "ⓒ", ["d"] = "ⓓ", ["e"] = "ⓔ",
+        ["f"] = "ⓕ", ["g"] = "ⓖ", ["h"] = "ⓗ", ["i"] = "ⓘ", ["j"] = "ⓙ",
+        ["k"] = "ⓚ", ["l"] = "ⓛ", ["m"] = "ⓜ", ["n"] = "ⓝ", ["o"] = "ⓞ",
+        ["p"] = "ⓟ", ["q"] = "ⓠ", ["r"] = "ⓡ", ["s"] = "ⓢ", ["t"] = "ⓣ",
+        ["u"] = "ⓤ", ["v"] = "ⓥ", ["w"] = "ⓦ", ["x"] = "ⓧ", ["y"] = "ⓨ", ["z"] = "ⓩ",
+        ["A"] = "Ⓐ", ["B"] = "Ⓑ", ["C"] = "Ⓒ", ["D"] = "Ⓓ", ["E"] = "Ⓔ",
+        ["F"] = "Ⓕ", ["G"] = "Ⓖ", ["H"] = "Ⓗ", ["I"] = "Ⓘ", ["J"] = "Ⓙ",
+        ["K"] = "Ⓚ", ["L"] = "Ⓛ", ["M"] = "Ⓜ", ["N"] = "Ⓝ", ["O"] = "Ⓞ",
+        ["P"] = "Ⓟ", ["Q"] = "Ⓠ", ["R"] = "Ⓡ", ["S"] = "Ⓢ", ["T"] = "Ⓣ",
+        ["U"] = "Ⓤ", ["V"] = "ⓥ", ["W"] = "ⓦ", ["X"] = "Ⓧ", ["Y"] = "Ⓨ", ["Z"] = "Ⓩ"
+    }
+    local newText = ""
+    for i = 1, #text do
+        local char = text:sub(i, i)
+        newText = newText .. (charMap[char] or char)
+    end
+    return newText
+end
+
+-- وظيفة تحديث البروفايل (RB & BI)
+local function UpdateProfile()
+    pcall(function()
+        local RE = ReplicatedStorage:WaitForChild("RE", 10)
+        if RE then
+            local topName = "ⓢⓟⓞⓞⓚⓘ  ⓒⓗⓐⓉ"
+            local circledName = ConvertToCircled(LocalPlayer.DisplayName)
+            local bioText = "✨" .. circledName .. "✨"
+
+            local purpleColor = Color3.fromRGB(170, 0, 255)
+            local greenColor = Color3.fromRGB(0, 255, 0)
+
+            -- تغيير لون الاسم والبيو
+            RE:FindFirstChild("1RPNam1eColo1r"):FireServer("PickingRPNameColor", purpleColor)
+            local bioColorRE = RE:FindFirstChild("1RPBio1Colo1r") or RE:FindFirstChild("RPBioColor")
+            if bioColorRE then
+                bioColorRE:FireServer("PickingRPBioColor", greenColor)
+            end
+
+            task.wait(0.3) 
+
+            -- تعيين النص (RB & BI)
+            RE:FindFirstChild("1RPNam1eTex1t"):FireServer("RolePlayName", topName)
+            RE:FindFirstChild("1RPNam1eTex1t"):FireServer("RolePlayBio", bioText)
+        end
+    end)
+end
+
+task.spawn(UpdateProfile)
+
+-- إنشاء الواجهة
+G2L["1"] = Instance.new("ScreenGui", game.CoreGui)
+G2L["1"]["Name"] = "SpookiRGB"
+
+-- الزر الدائري القابل للسحب
+G2L["btn"] = Instance.new("TextButton", G2L["1"])
+G2L["btn"]["Text"] = "S"
+G2L["btn"]["Size"] = UDim2.new(0, 55, 0, 55)
+G2L["btn"]["Position"] = UDim2.new(0, 20, 1, -150)
+G2L["btn"]["BackgroundColor3"] = Color3.fromRGB(0, 0, 0)
+G2L["btn"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
+G2L["btn"]["TextSize"] = 28
+G2L["btn"]["FontFace"] = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.Bold)
+G2L["btn"]["BorderSizePixel"] = 0
+
+local btnCorner = Instance.new("UICorner", G2L["btn"])
+btnCorner.CornerRadius = UDim.new(1, 0)
+
+local btnStroke = Instance.new("UIStroke", G2L["btn"])
+btnStroke.Thickness = 3
+btnStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- الواجهة الرئيسية
+G2L["2"] = Instance.new("Frame", G2L["1"])
+G2L["2"]["BackgroundColor3"] = Color3.fromRGB(10, 10, 10)
+G2L["2"]["Size"] = UDim2.new(0, 340, 0, 260)
+G2L["2"]["Position"] = UDim2.new(0.5, -170, 0.5, -130)
+G2L["2"]["Active"] = true
+
+local mainCorner = Instance.new("UICorner", G2L["2"])
+mainCorner.CornerRadius = UDim.new(0, 12)
+
+local mainStroke = Instance.new("UIStroke", G2L["2"])
+mainStroke.Thickness = 3
+mainStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+-- تأثير الرينبو للحواف
+task.spawn(function()
+    local hue = 0
+    while true do
+        hue = hue + (1/200)
+        if hue > 1 then hue = 0 end
+        local color = Color3.fromHSV(hue, 0.8, 1)
+        mainStroke.Color = color
+        btnStroke.Color = color
+        RunService.RenderStepped:Wait()
+    end
+end)
+
+-- محتويات الواجهة (العنوان، السجل، المدخلات)
+local title = Instance.new("TextLabel", G2L["2"])
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "SPOOKI RGB CHAT"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.TextSize = 18
+
+local chatFrame = Instance.new("ScrollingFrame", G2L["2"])
+chatFrame.Size = UDim2.new(0.9, 0, 0.6, 0)
+chatFrame.Position = UDim2.new(0.05, 0, 0.15, 0)
+chatFrame.BackgroundTransparency = 1
+chatFrame.ScrollBarThickness = 2
+
+local list = Instance.new("UIListLayout", chatFrame)
+list.Padding = UDim.new(0, 5)
+
+local input = Instance.new("TextBox", G2L["2"])
+input.Size = UDim2.new(0.85, 0, 0, 35)
+input.Position = UDim2.new(0.075, 0, 0.8, 0)
+input.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+input.TextColor3 = Color3.fromRGB(255, 255, 255)
+input.PlaceholderText = "Type here..."
+input.Text = ""
+Instance.new("UICorner", input)
+
+-- منطق السحب (Drag)
+local function MakeDraggable(obj)
+    local UIS = game:GetService("UserInputService")
+    local dragging, dragInput, dragStart, startPos
+    obj.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = obj.Position
+        end
+    end)
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+end
+
+MakeDraggable(G2L["2"])
+MakeDraggable(G2L["btn"])
+
+-- تشغيل المحادثة (WebSocket)
+local function StartWS()
+    local Http = game:GetService("HttpService")
+    local ws = WebSocket.connect("wss://free.blr2.piesocket.com/v3/1?api_key=eLudeCBiiTiQSr6DWJPMPfpZK9B6ghEu90ZbJwzm&notify_self=1")
+    
+    input.FocusLost:Connect(function(enter)
+        if enter and input.Text ~= "" then
+            ws:Send(Http:JSONEncode({
+                username = LocalPlayer.Name,
+                message = input.Text,
+                jobid = game.JobId
+            }))
+            input.Text = ""
+        end
+    end)
+
+    ws.OnMessage:Connect(function(msg)
+        local data = Http:JSONDecode(msg)
+        if data.jobid ~= game.JobId then return end
+        local m = Instance.new("TextLabel", chatFrame)
+        m.Size = UDim2.new(1, 0, 0, 20)
+        m.Text = data.username .. ": " .. data.message
+        m.TextColor3 = Color3.fromRGB(255, 255, 255)
+        m.BackgroundTransparency = 1
+        m.TextXAlignment = Enum.TextXAlignment.Left
+    end)
+end
+
+task.spawn(StartWS)
+
+G2L["btn"].MouseButton1Click:Connect(function()
+    G2L["2"].Visible = not G2L["2"].Visible
+end)
+
+return G2L["1"]
